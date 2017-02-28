@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SettingsTableViewController: UITableViewController {
+class SearchSettingsViewController: UITableViewController {
 
     @IBOutlet weak var minStarValue: UILabel!
     @IBOutlet weak var slider: UISlider!
@@ -21,6 +21,10 @@ class SettingsTableViewController: UITableViewController {
     @IBOutlet weak var swiftCell: UITableViewCell!
     
     var checked: [Bool] = []
+    var settings: GithubRepoSearchSettings?
+    var settingsCopy: GithubRepoSearchSettings?
+
+    weak var delegate: SettingsPresentingViewControllerDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,11 +35,10 @@ class SettingsTableViewController: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         
-        let defaults = UserDefaults.standard
-        slider.value = defaults.float(forKey: "minStars")
+        slider.value = Float(settings!.minStars)
         slider.sendActions(for: UIControlEvents.valueChanged)
-        langSwitch.isOn = defaults.bool(forKey: "langSwitch")
-        langSwitch.sendActions(for: UIControlEvents.valueChanged)
+        //langSwitch.isOn = defaults.bool(forKey: "langSwitch")
+        //langSwitch.sendActions(for: UIControlEvents.valueChanged)
     }
 
     override func didReceiveMemoryWarning() {
@@ -75,19 +78,28 @@ class SettingsTableViewController: UITableViewController {
         
     }
     
+    @IBAction func saveButtonTapped(_ sender: UIBarButtonItem) {
+        self.delegate?.didSaveSettings(settings: settings!)
+    }
+    
+    @IBAction func cancelButtonTapped(_ sender: UIBarButtonItem) {
+        self.delegate?.didCancelSettings()
+    }
+    /*
     @IBAction func save(_ sender: Any) {
         let defaults = UserDefaults.standard
         defaults.set(Int(slider.value), forKey: "minStars")
         defaults.set(langSwitch.isOn, forKey: "langSwitch")
         defaults.synchronize()
-        _ = navigationController?.popViewController(animated: true)
+        self.dismiss(animated: true, completion: {})
     }
     
     @IBAction func cancel(_ sender: Any) {
-        _ = navigationController?.popViewController(animated: true)
+        self.dismiss(animated: true, completion: {})
     }
-    
+    */
     @IBAction func sliderChange(_ sender: Any) {
+        settings?.minStars = Int(slider.value)
         minStarValue.text = String(Int(slider.value))
     }
     
@@ -165,4 +177,9 @@ class SettingsTableViewController: UITableViewController {
     }
     */
 
+}
+
+protocol SettingsPresentingViewControllerDelegate: class {
+    func didSaveSettings(settings: GithubRepoSearchSettings)
+    func didCancelSettings()
 }
