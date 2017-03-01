@@ -10,6 +10,8 @@ import Foundation
 import AFNetworking
 
 private let reposUrl = "https://api.github.com/search/repositories"
+//private let clientId: String? = "b196f085d268636be647"
+//private let clientSecret: String? = "330973ea0029e24ed9cd53a974d45af639471117"
 private let clientId: String? = nil
 private let clientSecret: String? = nil
 
@@ -89,7 +91,15 @@ class GithubRepo: CustomStringConvertible {
             q = q + searchString
         }
         q = q + " stars:>\(settings.minStars)"
+        if settings.langSwitch {
+            if !settings.languages.isEmpty {
+                for lang in settings.languages {
+                    q = q + " language:" + lang
+                }
+            }
+        }
         params["q"] = q
+        
         
         params["sort"] = "stars"
         params["order"] = "desc"

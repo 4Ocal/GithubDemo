@@ -12,6 +12,8 @@ import Foundation
 struct GithubRepoSearchSettings {
     var searchString: String?
     var minStars = 0
+    var langSwitch = false
+    var languages = ["Java", "JavaScript", "Objective-C", "Python", "Ruby", "Swift"]
     
     init() {
         

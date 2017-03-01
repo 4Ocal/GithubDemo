@@ -22,7 +22,6 @@ class SearchSettingsViewController: UITableViewController {
     
     var checked: [Bool] = []
     var settings: GithubRepoSearchSettings?
-    var settingsCopy: GithubRepoSearchSettings?
 
     weak var delegate: SettingsPresentingViewControllerDelegate?
     
@@ -35,10 +34,29 @@ class SearchSettingsViewController: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem()
         
+        javaCell.textLabel?.text = "Java"
+        javascriptCell.textLabel?.text = "JavaScript"
+        objectivecCell.textLabel?.text = "Objective-C"
+        pythonCell.textLabel?.text = "Python"
+        rubyCell.textLabel?.text = "Ruby"
+        swiftCell.textLabel?.text = "Swift"
+        
         slider.value = Float(settings!.minStars)
         slider.sendActions(for: UIControlEvents.valueChanged)
-        //langSwitch.isOn = defaults.bool(forKey: "langSwitch")
-        //langSwitch.sendActions(for: UIControlEvents.valueChanged)
+        langSwitch.isOn = Bool(settings!.langSwitch)
+        langSwitch.sendActions(for: UIControlEvents.valueChanged)
+        if langSwitch.isOn {
+            for row in 1...tableView.numberOfRows(inSection: 1) {
+                let cell = tableView.cellForRow(at: IndexPath(row: row, section: 1))
+                let text = (cell?.textLabel?.text)!
+                if (settings?.languages.contains(text))! {
+                    cell?.accessoryType = .checkmark
+                } else {
+                    cell?.accessoryType = .none
+                }
+            }
+        }
+        
     }
 
     override func didReceiveMemoryWarning() {
@@ -67,11 +85,16 @@ class SearchSettingsViewController: UITableViewController {
         
         if (section == 1) {
             if (row != 0) {
+                let text = (cell?.textLabel?.text)!
                 if (cell?.accessoryType.rawValue == 0) {
                     // for some reason checking accessoryType == .none doesn't work
                     cell?.accessoryType = .checkmark
+                    settings?.languages.append(text)
                 } else if (cell?.accessoryType.rawValue == 3) {
                     cell?.accessoryType = .none
+                    if (settings?.languages.contains(text))! {
+                        settings?.languages.remove(at: (settings?.languages.index(of: text))!)
+                    }
                 }
             }
         }
@@ -85,19 +108,7 @@ class SearchSettingsViewController: UITableViewController {
     @IBAction func cancelButtonTapped(_ sender: UIBarButtonItem) {
         self.delegate?.didCancelSettings()
     }
-    /*
-    @IBAction func save(_ sender: Any) {
-        let defaults = UserDefaults.standard
-        defaults.set(Int(slider.value), forKey: "minStars")
-        defaults.set(langSwitch.isOn, forKey: "langSwitch")
-        defaults.synchronize()
-        self.dismiss(animated: true, completion: {})
-    }
-    
-    @IBAction func cancel(_ sender: Any) {
-        self.dismiss(animated: true, completion: {})
-    }
-    */
+
     @IBAction func sliderChange(_ sender: Any) {
         settings?.minStars = Int(slider.value)
         minStarValue.text = String(Int(slider.value))
@@ -105,6 +116,7 @@ class SearchSettingsViewController: UITableViewController {
     
     @IBAction func langFilterSwitch(_ sender: Any) {
         if (langSwitch.isOn) {
+            settings?.langSwitch = true
             javaCell.isHidden = false
             javascriptCell.isHidden = false
             objectivecCell.isHidden = false
@@ -112,13 +124,13 @@ class SearchSettingsViewController: UITableViewController {
             rubyCell.isHidden = false
             swiftCell.isHidden = false
         } else {
+            settings?.langSwitch = false
             javaCell.isHidden = true
             javascriptCell.isHidden = true
             objectivecCell.isHidden = true
             pythonCell.isHidden = true
             rubyCell.isHidden = true
             swiftCell.isHidden = true
-            
         }
     }
     

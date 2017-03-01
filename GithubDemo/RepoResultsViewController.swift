@@ -81,6 +81,8 @@ class RepoResultsViewController: UIViewController, UITableViewDelegate, UITableV
     
     func didSaveSettings(settings: GithubRepoSearchSettings) {
         searchSettings.minStars = settings.minStars
+        searchSettings.langSwitch = settings.langSwitch
+        searchSettings.languages = settings.languages
         dismiss(animated: true, completion: {})
         doSearch()
     }
